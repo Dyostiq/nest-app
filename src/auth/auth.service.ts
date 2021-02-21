@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import * as bcrypt from 'bcrypt'
 import {JwtService} from '@nestjs/jwt';
+import * as crypto from 'crypto'
 
 import {User, UsersRepository} from '../users';
 
@@ -34,13 +35,14 @@ export class AuthService {
      */
     async validateUser(user: UserInput): Promise<User | false> {
         const foundUser = await this.users.find(user.email)
+        const shaHashedPassword = this.#hashShaPassword(user.password)
         if (!foundUser) {
             // to prevent deducing users in DB on a response time basis
-            await this.fakeCheck(user.password);
+            await this.#fakeCheck(shaHashedPassword);
             return false;
         }
 
-        return await bcrypt.compare(user.password, foundUser.passwordHash) ? foundUser : false
+        return await bcrypt.compare(shaHashedPassword, foundUser.passwordHash) ? foundUser : false
     }
 
     /**
@@ -53,11 +55,16 @@ export class AuthService {
             return false
         }
 
+        const shaHash = this.#hashShaPassword(user.password)
+        const passwordHash = await bcrypt.hash(shaHash, 10)
+
+        const createdUserId = await this.users.create({
+            email: user.email,
+            passwordHash,
+        })
+
         return {
-            id: await this.users.create({
-                email: user.email,
-                passwordHash: await bcrypt.hash(user.password, 10),
-            })
+            id: createdUserId
         }
     }
 
@@ -70,8 +77,13 @@ export class AuthService {
         }
     }
 
-    private async fakeCheck(password: string): Promise<void> {
-        const passwordHash = '$2b$10$uV.Pr.ov6HRcQbo1yJTi3.GEAsmkp.rSziGJs62IlmKOfM.20CPpi'
-        await bcrypt.compare(password, passwordHash)
-    }
+    #fakeCheck = async (password: string): Promise<void> => {
+        const fakePasswordHash = '$2b$10$uV.Pr.ov6HRcQbo1yJTi3.GEAsmkp.rSziGJs62IlmKOfM.20CPpi'
+        await bcrypt.compare(password, fakePasswordHash)
+    };
+
+    #hashShaPassword = (password: string): string => crypto
+        .createHash('sha256')
+        .update(password)
+        .digest('base64');
 }

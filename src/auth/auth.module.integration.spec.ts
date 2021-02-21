@@ -164,6 +164,23 @@ describe(`when getting profile info`, () => {
     })
 })
 
+describe(`when signed up with 72 bytes password`, () => {
+    beforeEach(async () => {
+        await signUp(`mail@example.test`, Array(72).fill('a').join(''))
+    })
+
+    describe(`when try to sign in with 73 bytes password`, () => {
+        let signInResponse: request.Response;
+        beforeEach(async () => {
+            signInResponse = await signIn(`mail@example.test`, Array(73).fill('a').join(''));
+        })
+
+        it(`should be unauthorized`, () => {
+            expect(signInResponse.status).toBe(401)
+        })
+    })
+})
+
 const signIn = async (email: string, password: string): Promise<request.Response> =>
     await request(app.getHttpServer()).post('/signin').send({email, password})
 const signUp = async (email: string, password: string): Promise<request.Response> =>

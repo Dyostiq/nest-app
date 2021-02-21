@@ -10,7 +10,8 @@ import {User, UserSchema} from './user.schema';
       schema: UserSchema
     }
   ])],
-  providers: [UsersRepository]
+  providers: [UsersRepository],
+  exports: [UsersRepository]
 })
 export class UsersModule {
 }

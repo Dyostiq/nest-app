@@ -5,6 +5,7 @@ import {Model} from 'mongoose';
 
 export class User implements UserModel {
     constructor(
+        public readonly id: string,
         public readonly email: string,
         public readonly passwordHash: string
     ) {
@@ -18,17 +19,18 @@ export class UsersRepository {
     ) {
     }
 
-    async createUser(param: User): Promise<void> {
-        await this.userModel.create({
+    async create(param: Omit<User, 'id'>): Promise<string> {
+        const user = await this.userModel.create({
             email: param.email,
             passwordHash: param.passwordHash,
         })
+        return user._id.toString()
     }
 
-    async findUser(email: string): Promise<User | null> {
+    async find(email: string): Promise<User | null> {
         const result = await this.userModel.findOne({
             email: email
         }).lean();
-        return result ? new User(result.email, result.passwordHash) : null;
+        return result ? new User(result._id.toString(), result.email, result.passwordHash) : null;
     }
 }

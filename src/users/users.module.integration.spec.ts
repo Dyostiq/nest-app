@@ -35,7 +35,7 @@ describe(`when creating a user`, () => {
     beforeEach(async () => {
         usersRepository = app.get(UsersRepository);
 
-        await usersRepository.createUser({
+        await usersRepository.create({
             email: 'example.email@example.com',
             passwordHash: 'aPasswordHash'
         })
@@ -44,11 +44,12 @@ describe(`when creating a user`, () => {
     describe(`when finding the user`, () => {
         let foundUser: User | null;
         beforeEach(async () => {
-            foundUser = await usersRepository.findUser('example.email@example.com');
+            foundUser = await usersRepository.find('example.email@example.com');
         })
 
         it(`should return the user`, () => {
-            expect(foundUser).toStrictEqual(new User(
+            expect(foundUser).toEqual(new User(
+                expect.any(String),
                 'example.email@example.com',
                 'aPasswordHash',
             ))
@@ -58,7 +59,7 @@ describe(`when creating a user`, () => {
     describe(`when finding a not existing user`, () => {
         let foundUser: User | null;
         beforeEach(async () => {
-            foundUser = await usersRepository.findUser('nonexisting@example.com');
+            foundUser = await usersRepository.find('nonexisting@example.com');
         })
 
         it(`should be null`, () => {

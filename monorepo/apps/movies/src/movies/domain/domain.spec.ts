@@ -103,7 +103,7 @@ withTime('2020-02-05T00:00:00-05:00', () => {
   });
 
   test.each`
-    User Type    | Local Date                     | Should Succeed
+    UserType     | LocalDate                      | ShouldSucceed
     ${'basic'}   | ${`2020-02-27T00:00:00-05:00`} | ${false}
     ${'basic'}   | ${`2020-02-28T00:00:00-05:00`} | ${false}
     ${'basic'}   | ${`2020-02-29T23:59:59-05:00`} | ${false}

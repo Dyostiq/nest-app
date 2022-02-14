@@ -1,0 +1,44 @@
+name: Recru Movie Tests
+
+on: push
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Use Node.js v14.15.5
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.15.5'
+      - name: Install deps
+        run: npm i
+        working-directory: ./api
+      - name: Unit tests
+        run: npm run test
+        working-directory: ./api
+  e2e:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Use Node.js v14.15.5
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.15.5'
+      - name: Install deps
+        run: npm i
+        working-directory: ./api
+      - name: Build the stack
+        run: docker-compose up -d
+      - name: Run db migration
+        run: for i in 1 2 3 4 5; do npm run typeorm -- migration:run && break || sleep 3; done
+        working-directory: ./api
+      - name: Check the stack
+        run: docker ps --all
+      - name: Run e2e tests
+        run: npm run test:e2e
+        working-directory: ./api

@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   Body,
   Controller,
@@ -47,8 +48,9 @@ export class MovieController {
         case 'too many movies in a month':
           throw new BadRequestException(result.left);
         case 'service unavailable':
+          throw new BadGatewayException(result.left);
         case 'cannot create a movie':
-          throw new InternalServerErrorException();
+          throw new InternalServerErrorException(result.left);
       }
     }
   }

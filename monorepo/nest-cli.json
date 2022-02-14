@@ -5,7 +5,10 @@
   "root": "apps/nest-app",
   "compilerOptions": {
     "webpack": true,
-    "tsConfigPath": "apps/nest-app/tsconfig.app.json"
+    "tsConfigPath": "apps/nest-app/tsconfig.app.json",
+    "plugins": [
+      "@nestjs/swagger"
+    ]
   },
   "projects": {
     "nest-app": {

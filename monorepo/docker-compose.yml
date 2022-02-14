@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGODB_DATABASE="recru"
+    ports:
+      - 27017:27017
+  movies:
+    build:
+      context: .
+      target: development
+      dockerfile: movies.Dockerfile
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    command: npm run start:dev movies
+    depends_on:
+      - db
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+  auth:
+    build:
+      context: .
+      target: development
+      dockerfile: auth.Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    command: npm run start:dev auth
+    depends_on:
+      - mongodb
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}

@@ -17,6 +17,13 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "@app/jwt-auth": [
+        "libs/jwt-auth/src"
+      ],
+      "@app/jwt-auth/*": [
+        "libs/jwt-auth/src/*"
+      ]
+    }
   }
 }

@@ -34,6 +34,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/auth/tsconfig.app.json"
       }
+    },
+    "jwt-auth": {
+      "type": "library",
+      "root": "libs/jwt-auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/jwt-auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/jwt-auth/tsconfig.lib.json"
+      }
     }
   }
 }

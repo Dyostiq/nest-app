@@ -28,6 +28,7 @@ services:
     command: npm run start:dev movies
     depends_on:
       - db
+      - redis
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_USERNAME: ${DB_USERNAME}

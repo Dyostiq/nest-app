@@ -1,15 +1,17 @@
 import { MovieCollectionRepository } from './movie-collection.repository';
-import { MovieCollectionFactory, UserId, MovieId } from '../domain';
+import {
+  cannotCreateAMovieError,
+  duplicateError,
+  MovieCollectionFactory,
+  MovieId,
+  tooManyMoviesInAMonthError,
+  UserId,
+} from '../domain';
 import { DetailsRepository } from './details.repository';
 import { DetailsService } from './details.service';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { Injectable } from '@nestjs/common';
-
-import {
-  duplicateError,
-  tooManyMoviesInAMonthError,
-  cannotCreateAMovieError,
-} from '../domain';
+import { UserStatusRepository } from './user-status.repository';
 
 export { duplicateError, tooManyMoviesInAMonthError, cannotCreateAMovieError };
 
@@ -27,15 +29,15 @@ export class CreateMovieService {
     private readonly collectionFactory: MovieCollectionFactory,
     private readonly detailsRepository: DetailsRepository,
     private readonly detailsService: DetailsService,
+    private readonly userStatus: UserStatusRepository,
   ) {}
 
   async createMovie(
     title: string,
     userId: string,
-    userRole: 'basic' | 'premium',
   ): Promise<Either<CreateMovieApplicationError, MovieId>> {
     const timezone = 'UTC';
-
+    const userRole = await this.userStatus.getStatusOfUser(userId);
     const createMovieResult = await this.createMovieInTransaction(
       userRole,
       timezone,

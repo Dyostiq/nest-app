@@ -6,6 +6,8 @@ import { DetailsRepository } from '../details.repository';
 import { InMemoryDetailsRepository } from './in-memory-details.repository';
 import { DetailsService } from '../details.service';
 import { InMemoryDetailsService } from './in-memory-details.service';
+import { AlwaysBasicUserStatusRepository } from './always-basic-user-status.repository';
+import { UserStatusRepository } from '../user-status.repository';
 
 @Module({
   imports: [MoviesDomainModule],
@@ -13,6 +15,7 @@ import { InMemoryDetailsService } from './in-memory-details.service';
     InMemoryCollectionRepository,
     InMemoryDetailsRepository,
     InMemoryDetailsService,
+    AlwaysBasicUserStatusRepository,
     {
       provide: MovieCollectionRepository,
       useExisting: InMemoryCollectionRepository,
@@ -24,6 +27,10 @@ import { InMemoryDetailsService } from './in-memory-details.service';
     {
       provide: DetailsService,
       useExisting: InMemoryDetailsService,
+    },
+    {
+      provide: UserStatusRepository,
+      useExisting: AlwaysBasicUserStatusRepository,
     },
   ],
   exports: [MovieCollectionRepository, DetailsRepository, DetailsService],

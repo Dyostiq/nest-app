@@ -23,6 +23,12 @@
       ],
       "@app/jwt-auth/*": [
         "libs/jwt-auth/src/*"
+      ],
+      "@app/payment-integration": [
+        "libs/payment-integration/src"
+      ],
+      "@app/payment-integration/*": [
+        "libs/payment-integration/src/*"
       ]
     }
   }

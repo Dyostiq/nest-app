@@ -47,7 +47,6 @@ export class MovieController {
     const result = await this.createMovieService.createMovie(
       body.title,
       user.id.toString(),
-      'basic',
     );
     if (isLeft(result)) {
       switch (result.left) {

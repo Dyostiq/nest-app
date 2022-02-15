@@ -29,7 +29,7 @@ beforeEach(async () => {
 test(`a user without a collection should be able to create a movie`, async () => {
   // given
   // when
-  const result = await createService.createMovie('Batman', '123', 'basic');
+  const result = await createService.createMovie('Batman', '123');
   // then
   assertRight(result);
   // and
@@ -46,9 +46,9 @@ test(`a user without a collection should be able to create a movie`, async () =>
 
 test(`a user with a collection should be able to create a movie`, async () => {
   // given
-  await createService.createMovie('Batman', '123', 'basic');
+  await createService.createMovie('Batman', '123');
   // when
-  await createService.createMovie('Batman Returns', '123', 'basic');
+  await createService.createMovie('Batman Returns', '123');
   // then
   expect(await readService.getMovies('123')).toStrictEqual([
     {
@@ -75,7 +75,7 @@ describe(`when a details service is not available`, () => {
     fixtures.detailsServiceUnavailable();
 
     // when
-    result = await createService.createMovie('Batman', '123', 'basic');
+    result = await createService.createMovie('Batman', '123');
   });
 
   // then
@@ -97,7 +97,7 @@ describe(`when a details repository is not available`, () => {
     fixtures.detailsRepositoryUnavailable();
 
     // when
-    result = await createService.createMovie('Batman', '123', 'basic');
+    result = await createService.createMovie('Batman', '123');
   });
 
   // then
@@ -119,7 +119,7 @@ describe(`when a collection repository is not available`, () => {
     fixtures.collectionRepositoryNotAvailable();
 
     // when
-    result = await createService.createMovie('Batman', '123', 'basic');
+    result = await createService.createMovie('Batman', '123');
   });
 
   // then

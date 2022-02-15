@@ -2,6 +2,8 @@
 export { MovieCollectionRepository } from './movie-collection.repository';
 export { DetailsService } from './details.service';
 export { DetailsRepository } from './details.repository';
+export { UserStatusRepository } from './user-status.repository';
+
 // in ports
 export { GetMoviesService, GetMoviesError } from './get-movies.service';
 export {

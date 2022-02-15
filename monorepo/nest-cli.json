@@ -46,6 +46,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/jwt-auth/tsconfig.lib.json"
       }
+    },
+    "payments": {
+      "type": "application",
+      "root": "apps/payments",
+      "entryFile": "main",
+      "sourceRoot": "apps/payments/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payments/tsconfig.app.json"
+      }
+    },
+    "payment-integration": {
+      "type": "library",
+      "root": "libs/payment-integration",
+      "entryFile": "index",
+      "sourceRoot": "libs/payment-integration/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/payment-integration/tsconfig.lib.json"
+      }
     }
   }
 }

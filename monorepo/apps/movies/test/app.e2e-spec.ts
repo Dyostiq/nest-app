@@ -52,6 +52,7 @@ test(`an not known movie should fail`, async () => {
   // and
   expect(creationResult.body).toStrictEqual({
     error: 'Bad Gateway',
+    message: 'service unavailable',
     statusCode: 502,
   });
   // and

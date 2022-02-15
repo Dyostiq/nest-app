@@ -53,11 +53,11 @@ export class MovieController {
       switch (result.left) {
         case duplicateError:
         case tooManyMoviesInAMonthError:
-          throw new BadRequestException(result.left);
+          throw new BadRequestException(result.left.description);
         case serviceUnavailableError:
-          throw new BadGatewayException(result.left);
+          throw new BadGatewayException(result.left.description);
         case cannotCreateAMovieError:
-          throw new InternalServerErrorException(result.left);
+          throw new InternalServerErrorException(result.left.description);
         default:
           const _exhaustiveCheck: never = result.left;
       }

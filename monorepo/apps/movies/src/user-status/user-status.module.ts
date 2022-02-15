@@ -6,7 +6,12 @@ import { GetUserStatusService } from './get-user-status.service';
 import { UserStatusService } from './user-status.service';
 
 @Module({
-  imports: [BullModule.registerQueue({ name: queueName })],
+  imports: [
+    // hack but I have no time to investigate
+    ...(process.env.NODE_ENV === 'test'
+      ? []
+      : [BullModule.registerQueue({ name: queueName })]),
+  ],
   providers: [PaymentPaidConsumer, GetUserStatusService, UserStatusService],
   exports: [GetUserStatusService],
 })

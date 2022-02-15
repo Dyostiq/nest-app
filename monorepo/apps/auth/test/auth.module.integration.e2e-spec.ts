@@ -6,7 +6,7 @@ import { Connection } from 'mongoose';
 import * as request from 'supertest';
 import { ConfigModule } from '@nestjs/config';
 
-import { AuthModule } from '.';
+import { AuthModule } from '../src/auth';
 
 let app: INestApplication;
 let connection: Connection;

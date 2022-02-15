@@ -1,10 +1,17 @@
 import { isRight } from 'fp-ts/Either';
 import { assertRight } from '../../test/assert-right';
 import { withTime } from './test/with-time';
-import { getFixtures } from './test/get-fixtures';
 import { assertLeft } from '../../test/assert-left';
+import { Test } from '@nestjs/testing';
+import { MoviesDomainModule } from './movies-domain.module';
+import { MovieCollectionFactory } from './movie-collection.factory';
+import { UserId } from './user.id';
 
-const fixtures = getFixtures();
+let fixtures: Awaited<ReturnType<typeof getFixtures>>;
+
+beforeEach(async () => {
+  fixtures = await getFixtures();
+});
 
 test(`a user can create a movie`, async () => {
   // given
@@ -152,3 +159,26 @@ withTime('2020-02-05T00:00:00-05:00', () => {
     },
   );
 });
+
+export async function getFixtures() {
+  const testingModule = await Test.createTestingModule({
+    imports: [MoviesDomainModule],
+  }).compile();
+
+  const movieCollectionFactory = testingModule.get(MovieCollectionFactory);
+
+  return {
+    aBasicUserMovieCollection: () =>
+      movieCollectionFactory.createMovieCollection(
+        'basic',
+        'America/New_York',
+        new UserId('basic user'),
+      ),
+    aPremiumUserMovieCollection: () =>
+      movieCollectionFactory.createMovieCollection(
+        'premium',
+        'America/New_York',
+        new UserId('premium'),
+      ),
+  };
+}

@@ -1,5 +1,5 @@
 import { assertRight } from '../../test/assert-right';
-import { Either } from 'fp-ts/Either';
+import { Either, left } from 'fp-ts/Either';
 import { assertLeft } from '../../test/assert-left';
 import { MovieId } from '../domain';
 import {
@@ -8,13 +8,20 @@ import {
   serviceUnavailableError,
 } from './create-movie.service';
 import { InMemoryReadService } from './test/in-memory-read.service';
-import { getFixtures } from './test/get-fixtures';
+import { InMemoryCollectionRepository } from './test/in-memory-collection.repository';
+import { InMemoryDetailsRepository } from './test/in-memory-details.repository';
+import { Test } from '@nestjs/testing';
+import { MoviesApplicationModule } from './movies-application.module';
+import { MoviesTestAdaptersModule } from './test/movies-test-adapters.module';
+import { MovieCollectionRepository } from './movie-collection.repository';
+import { DetailsRepository } from './details.repository';
+import { DetailsService } from './details.service';
 
-const fixtures = getFixtures();
-
+let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 let createService: CreateMovieService;
 let readService: InMemoryReadService;
-beforeEach(() => {
+beforeEach(async () => {
+  fixtures = await getFixtures();
   createService = fixtures.getCreateMovie();
   readService = fixtures.getReadService();
 });
@@ -126,3 +133,38 @@ describe(`when a collection repository is not available`, () => {
     expect(await readService.getMovies('123')).toStrictEqual([]);
   });
 });
+
+export async function getFixtures() {
+  const testingModule = await Test.createTestingModule({
+    imports: [MoviesApplicationModule.for([MoviesTestAdaptersModule])],
+  }).compile();
+
+  const collectionRepository: InMemoryCollectionRepository = testingModule.get(
+    MovieCollectionRepository,
+  );
+  const detailsRepository: InMemoryDetailsRepository =
+    testingModule.get(DetailsRepository);
+  const inMemoryDetailsService = testingModule.get(DetailsService);
+  const createService = testingModule.get(CreateMovieService);
+
+  readService = new InMemoryReadService(
+    collectionRepository,
+    detailsRepository,
+  );
+
+  return {
+    getCreateMovie: () => createService,
+    getReadService: () => readService,
+    detailsServiceUnavailable: () => {
+      inMemoryDetailsService.fetchDetails = async () =>
+        left(new Error('unavailable'));
+    },
+    collectionRepositoryNotAvailable: () => {
+      collectionRepository.findUserMovieCollection = async () =>
+        left(new Error('unavailable'));
+    },
+    detailsRepositoryUnavailable: () => {
+      detailsRepository.save = async () => left(new Error('unavailable'));
+    },
+  };
+}

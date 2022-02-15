@@ -16,7 +16,7 @@ beforeAll(async () => {
     imports: [
       MongooseModule.forRoot('mongodb://localhost/test'),
       ConfigModule.forRoot({
-        envFilePath: `.env.test`,
+        envFilePath: `.env`,
       }),
       AuthModule,
     ],

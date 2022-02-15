@@ -5,16 +5,24 @@ import {
   UserId,
 } from '../../../src/movies/domain';
 import { assertRight } from '../../../src/test/assert-right';
-import { getFixtures } from './get-fixtures';
 import { right } from 'fp-ts/Either';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../../../src/app.module';
+import { clearRepo } from '../../clear-repo';
+import { MovieCollectionRepository } from '../../../src/movies/application';
 
 let typeormMovieCollectionRepository: TypeormMovieCollectionRepository,
   movieCollectionFactory: MovieCollectionFactory;
-const fixtures = getFixtures();
+let fixtures: Awaited<ReturnType<typeof getFixtures>>;
 beforeEach(async () => {
+  fixtures = await getFixtures();
   typeormMovieCollectionRepository =
     fixtures.getTypeormMovieCollectionRepository();
   movieCollectionFactory = fixtures.getMovieCollectionFactory();
+});
+
+afterEach(async () => {
+  await fixtures.cleanup();
 });
 
 test(`should be able to retrieve saved entity`, async () => {
@@ -103,3 +111,27 @@ test(`should update entities`, async () => {
     ),
   ).toStrictEqual(right(updatedMovieCollection));
 });
+
+export async function getFixtures() {
+  const moduleFixture = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  await moduleFixture.init();
+
+  await clearRepo(moduleFixture);
+
+  return {
+    getTypeormMovieCollectionRepository: () => {
+      const repo = moduleFixture.get(MovieCollectionRepository);
+      if (!(repo instanceof TypeormMovieCollectionRepository)) {
+        fail();
+      }
+      return repo;
+    },
+    getMovieCollectionFactory: () => moduleFixture.get(MovieCollectionFactory),
+
+    cleanup: async () => {
+      await moduleFixture.close();
+    },
+  };
+}

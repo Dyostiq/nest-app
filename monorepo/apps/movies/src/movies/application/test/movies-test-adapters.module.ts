@@ -10,17 +10,20 @@ import { InMemoryDetailsService } from './in-memory-details.service';
 @Module({
   imports: [MoviesDomainModule],
   providers: [
+    InMemoryCollectionRepository,
+    InMemoryDetailsRepository,
+    InMemoryDetailsService,
     {
       provide: MovieCollectionRepository,
-      useClass: InMemoryCollectionRepository,
+      useExisting: InMemoryCollectionRepository,
     },
     {
       provide: DetailsRepository,
-      useClass: InMemoryDetailsRepository,
+      useExisting: InMemoryDetailsRepository,
     },
     {
       provide: DetailsService,
-      useClass: InMemoryDetailsService,
+      useExisting: InMemoryDetailsService,
     },
   ],
   exports: [MovieCollectionRepository, DetailsRepository, DetailsService],

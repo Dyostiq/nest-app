@@ -1,18 +1,24 @@
 import { MovieCollectionRepository } from './movie-collection.repository';
-import {
-  CreateAMovieError,
-  MovieCollectionFactory,
-  UserId,
-  MovieId,
-} from '../domain';
+import { MovieCollectionFactory, UserId, MovieId } from '../domain';
 import { DetailsRepository } from './details.repository';
 import { DetailsService } from './details.service';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { Injectable } from '@nestjs/common';
 
+import {
+  duplicateError,
+  tooManyMoviesInAMonthError,
+  cannotCreateAMovieError,
+} from '../domain';
+
+export { duplicateError, tooManyMoviesInAMonthError, cannotCreateAMovieError };
+
+export const serviceUnavailableError = Symbol('service unavailable');
 export type CreateMovieApplicationError =
-  | 'service unavailable'
-  | CreateAMovieError;
+  | typeof serviceUnavailableError
+  | typeof duplicateError
+  | typeof tooManyMoviesInAMonthError
+  | typeof cannotCreateAMovieError;
 
 @Injectable()
 export class CreateMovieService {
@@ -45,7 +51,7 @@ export class CreateMovieService {
 
     if (isLeft(fetchedDetails)) {
       await this.rollbackMovieInTransaction(userRole, timezone, userId, title);
-      return left('service unavailable' as const);
+      return left(serviceUnavailableError);
     }
 
     const detailsSaveResult: Either<Error, MovieId> =
@@ -56,7 +62,7 @@ export class CreateMovieService {
 
     if (isLeft(detailsSaveResult)) {
       await this.rollbackMovieInTransaction(userRole, timezone, userId, title);
-      return left('service unavailable');
+      return left(serviceUnavailableError);
     }
 
     return createMovieResult;
@@ -67,7 +73,7 @@ export class CreateMovieService {
     timezone: string,
     userId: string,
     title: string,
-  ) {
+  ): Promise<Either<CreateMovieApplicationError, MovieId>> {
     return await this.collections.withTransaction(
       async (transactionalCollections) => {
         const findResult =
@@ -77,7 +83,7 @@ export class CreateMovieService {
             userId,
           );
         if (isLeft(findResult)) {
-          return left('service unavailable' as const);
+          return left(serviceUnavailableError);
         }
 
         const collection =
@@ -97,7 +103,7 @@ export class CreateMovieService {
           collection,
         );
         if (isLeft(saveResult)) {
-          return left('service unavailable' as const);
+          return left(serviceUnavailableError);
         }
         return movieCreationResult;
       },
@@ -118,21 +124,21 @@ export class CreateMovieService {
       );
 
       if (isLeft(findResult)) {
-        return left('service unavailable' as const);
+        return left(serviceUnavailableError);
       }
       const collection = findResult.right;
       if (!collection) {
-        return left('service unavailable' as const);
+        return left(serviceUnavailableError);
       }
       const rollbackResult = await collection.rollbackMovie(title);
       if (isLeft(rollbackResult)) {
-        return left('service unavailable' as const);
+        return left(serviceUnavailableError);
       }
       const rollbackSaveResult = await transactionalCollections.saveCollection(
         collection,
       );
       if (isLeft(rollbackSaveResult)) {
-        return left('service unavailable' as const);
+        return left(serviceUnavailableError);
       }
       return right(true);
     });

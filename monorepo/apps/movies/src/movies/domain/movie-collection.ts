@@ -9,8 +9,12 @@ import { MovieId } from './movie.id';
 import { BasicUserPolicyError } from './basic-user.policy';
 
 type AllCreateMoviePolicyError = BasicUserPolicyError | CreateMoviePolicyError;
-export type CreateAMovieError = 'duplicate' | AllCreateMoviePolicyError;
-export type RollbackMovieError = 'the movie does not exist';
+export const duplicateError = Symbol('duplicate');
+export type CreateAMovieError =
+  | typeof duplicateError
+  | AllCreateMoviePolicyError;
+export const theMovieDoesNotExistError = Symbol('the movie does not exist');
+export type RollbackMovieError = typeof theMovieDoesNotExistError;
 export type MovieCollectionSnapshot = Readonly<{
   movies: Movie[];
   timezone: string;
@@ -40,7 +44,7 @@ export class MovieCollection {
 
   createMovie(title: string): Either<CreateAMovieError, MovieId> {
     if (this.isADuplicate(title)) {
-      return left('duplicate');
+      return left(duplicateError);
     }
     const result = this.policy.canCreate(this.movies, this.timezone);
     if (isLeft(result)) {
@@ -59,7 +63,7 @@ export class MovieCollection {
       this.removeMovie(title);
       return right(true);
     } else {
-      return left('the movie does not exist');
+      return left(theMovieDoesNotExistError);
     }
   }
 

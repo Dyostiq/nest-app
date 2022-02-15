@@ -5,4 +5,5 @@ export abstract class CreateMoviePolicy<Errors = CreateMoviePolicyError> {
   abstract canCreate(movies: Movie[], timezone: string): Either<Errors, true>;
 }
 
-export type CreateMoviePolicyError = 'cannot create a movie';
+export const cannotCreateAMovieError = Symbol('cannot create a movie');
+export type CreateMoviePolicyError = typeof cannotCreateAMovieError;

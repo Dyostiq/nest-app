@@ -4,7 +4,8 @@ import { Either, left, right } from 'fp-ts/Either';
 import { CreateMoviePolicy } from './create-movie.policy';
 import { Movie } from './movie';
 
-export type BasicUserPolicyError = 'too many movies in a month';
+export const tooManyMoviesInAMonthError = Symbol('too many movies in a month');
+export type BasicUserPolicyError = typeof tooManyMoviesInAMonthError;
 
 @Injectable()
 export class BasicUserPolicy extends CreateMoviePolicy<BasicUserPolicyError> {
@@ -13,7 +14,7 @@ export class BasicUserPolicy extends CreateMoviePolicy<BasicUserPolicyError> {
     timezone: string,
   ): Either<BasicUserPolicyError, true> {
     if (this.numberOfMoviesThisMonth(movies, timezone) >= 5) {
-      return left('too many movies in a month');
+      return left(tooManyMoviesInAMonthError);
     }
     return right(true);
   }

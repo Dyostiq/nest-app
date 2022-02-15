@@ -14,7 +14,14 @@ import { Request } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { JwtAuthGuard } from '@app/jwt-auth';
-import { CreateMovieService, GetMoviesService } from '../application';
+import {
+  cannotCreateAMovieError,
+  CreateMovieService,
+  duplicateError,
+  GetMoviesService,
+  serviceUnavailableError,
+  tooManyMoviesInAMonthError,
+} from '../application';
 import { CreateMovieDto } from './create-movie.dto';
 import { MoviesCollectionDto } from './movies-collection.dto';
 
@@ -44,13 +51,15 @@ export class MovieController {
     );
     if (isLeft(result)) {
       switch (result.left) {
-        case 'duplicate':
-        case 'too many movies in a month':
+        case duplicateError:
+        case tooManyMoviesInAMonthError:
           throw new BadRequestException(result.left);
-        case 'service unavailable':
+        case serviceUnavailableError:
           throw new BadGatewayException(result.left);
-        case 'cannot create a movie':
+        case cannotCreateAMovieError:
           throw new InternalServerErrorException(result.left);
+        default:
+          const _exhaustiveCheck: never = result.left;
       }
     }
   }

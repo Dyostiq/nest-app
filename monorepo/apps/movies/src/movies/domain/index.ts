@@ -8,4 +8,8 @@ export {
   CreateAMovieError,
   RollbackMovieError,
   MovieCollectionSnapshot,
+  duplicateError,
+  theMovieDoesNotExistError,
 } from './movie-collection';
+export { tooManyMoviesInAMonthError } from './basic-user.policy';
+export { cannotCreateAMovieError } from './create-movie.policy';

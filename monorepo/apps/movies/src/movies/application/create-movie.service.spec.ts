@@ -5,6 +5,7 @@ import { MovieId } from '../domain';
 import {
   CreateMovieService,
   CreateMovieApplicationError,
+  serviceUnavailableError,
 } from './create-movie.service';
 import { InMemoryReadService } from './test/in-memory-read.service';
 import { getFixtures } from './test/get-fixtures';
@@ -73,7 +74,7 @@ describe(`when a details service is not available`, () => {
   // then
   it(`should return an error`, async () => {
     assertLeft(result);
-    expect(result.left).toBe('service unavailable');
+    expect(result.left).toBe(serviceUnavailableError);
   });
 
   // and
@@ -95,7 +96,7 @@ describe(`when a details repository is not available`, () => {
   // then
   it(`should return an error`, async () => {
     assertLeft(result);
-    expect(result.left).toBe('service unavailable');
+    expect(result.left).toBe(serviceUnavailableError);
   });
 
   // and
@@ -117,7 +118,7 @@ describe(`when a collection repository is not available`, () => {
   // then
   it(`should return an error`, async () => {
     assertLeft(result);
-    expect(result.left).toBe('service unavailable');
+    expect(result.left).toBe(serviceUnavailableError);
   });
 
   // and

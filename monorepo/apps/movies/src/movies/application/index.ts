@@ -4,7 +4,13 @@ export { DetailsService } from './details.service';
 export { DetailsRepository } from './details.repository';
 // in ports
 export { GetMoviesService, GetMoviesError } from './get-movies.service';
-export { CreateMovieService } from './create-movie.service';
+export {
+  CreateMovieService,
+  serviceUnavailableError,
+  duplicateError,
+  tooManyMoviesInAMonthError,
+  cannotCreateAMovieError,
+} from './create-movie.service';
 
 // data
 export { MovieDetails } from './movie-details';
